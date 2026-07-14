@@ -1,21 +1,25 @@
-bits 32
+BITS 32
 
-section .multiboot               ;according to multiboot spec
-        dd 0x1BADB002            ;set magic number for
-                                 ;bootloader
-        dd 0x0                   ;set flags
-        
+section .multiboot
+align 4
+    dd 0x1BADB002
+    dd 0x0
+    dd -(0x1BADB002)
 
 section .text
 global start
-extern main                      ;defined in the C file
+extern main
 
 start:
-        cli                      ;block interrupts
-        mov esp, stack_space     ;set stack pointer
-        call main
-        hlt                      ;halt the CPU
+    cli
+    mov esp, stack_space
+    call main
+
+.hang:
+    cli
+    hlt
+    jmp .hang
 
 section .bss
-resb 16000                        ;16KB for stack
+    resb 16384
 stack_space:
